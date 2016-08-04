@@ -1,0 +1,158 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{congregacoesBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Consulta congregações</h1> 
+ 	
+ 	<h:form id="frm-congregacao"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Nova congregação" icon="ui-icon-flag" 
+			action="#{congregacoesBean.prepararNovoCadastro}"
+			process="@this"  update="congregacao-dialog"
+			
+			oncomplete="PF('edicaoCongregacaoDialog').show()"
+			disabled="#{congregacoesBean.congregacaoSelecionada != null or seguranca.usuarioLogado.usuario.perfil != 'ADMIN'}">
+			
+			<p:resetInput target="congregacao-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this"  update="congregacao-dialog"
+	         		oncomplete="PF('edicaoCongregacaoDialog').show()"
+	         		disabled="#{congregacoesBean.congregacaoSelecionada == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'
+	         		or seguranca.usuarioLogado.usuario.congregacao != congregacoesBean.congregacaoSelecionada and seguranca.usuarioLogado.usuario.perfil != 'ADMIN' }">
+	         		<p:resetInput target="congregacao-dialog" />
+	         		
+	         		<f:setPropertyActionListener value="#{congregacoesBean.congregacaoSelecionada}" 
+	         		target="#{congregacoesBean.congregacaoEdicao}" />
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="congregacoes-table msgs toolbar"
+	         		action="#{congregacoesBean.excluir}"
+	         		disabled="#{congregacoesBean.congregacaoSelecionada == null or seguranca.usuarioLogado.usuario.perfil != 'ADMIN' }">
+	         		
+	         			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir esta congregação"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para XLS" 
+						ajax="false" immediate="true" >
+	         			<p:dataExporter type="xls" target="congregacoes-table" fileName="congregacoes"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	<div class="ui-fluid">
+	
+   	<p:dataTable value="#{congregacoesBean.todasCongregacoes}" var="congregacao" border="1" cellspacing="0" cellpadding="2"
+	emptyMessage="Nenhuma congregação cadastrada." rows="10" paginator="true" paginatorPosition="bottom" style="margin-top: 10px" 
+	id="congregacoes-table" selection="#{congregacoesBean.congregacaoSelecionada}" selectionMode="single" rowKey="#{congregacao.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-congregacao:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-congregacao:toolbar"/>
+  			
+		<p:column  headerText="Congregação" sortBy="#{congregacao.nomeCongregacao}" width="140">
+  			<h:outputText value="#{congregacao.nomeCongregacao}"/>  
+		</p:column>
+		
+		<p:column headerText="Endereço" sortBy="#{congregacao.endereco}" > 
+	  		<h:outputText value="#{congregacao.endereco}"/>  
+		</p:column>
+		
+		<p:column headerText="Email" sortBy="#{congregacao.email}" width="180" priority="6"> 
+	  		<h:outputText value="#{congregacao.email}"/>  
+		</p:column>
+		
+		<p:column headerText="Telefone" sortBy="#{congregacao.telefone}" width="83" priority="4"> 
+	  		<h:outputText value="#{congregacao.telefone}"/>  
+		</p:column>
+		
+		<p:column headerText="Cidade" sortBy="#{congregacao.cidade.nomeCidade}" width="110" priority="3"> 
+	  		<h:outputText value="#{congregacao.cidade.nomeCidade}"/>  
+		</p:column>
+			
+		<p:column headerText="Estado" sortBy="#{congregacao.cidade.estado}" width="83" priority="2"> 
+	  		<h:outputText value="#{congregacao.cidade.estado}"/>  
+		</p:column>
+		
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(congregacoesBean.congregacoes)}" /> 
+			<h:outputText value=" congregações cadastradas. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>  
+	</div>	
+		
+	 	<p:dialog header="Cadastro de congregações" widgetVar="edicaoCongregacaoDialog"  showEffect="explode" 
+	 	id="congregacao-dialog" resizable="false"  responsive="true" closeOnEscape="true" modal="true">
+		
+			<p:messages id="msgs-dialog"/>
+			
+			<p:defaultCommand target="cadastrar-button" scope="congregacao-dialog"/>
+			
+			<div class="ui-fluid">
+			
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-4, ui-grid-col-8" id="painel-dialog">
+					
+				<p:outputLabel value="Congregação:" for="congregacao" style="font-weight:bold"/>
+				<p:inputText id="congregacao" size="25" maxlength="30"
+				value="#{congregacoesBean.congregacaoEdicao.nomeCongregacao}"/>
+				
+				<p:outputLabel value="Telefone:" for="telefone-congregacao" style="font-weight:bold"/>
+				<p:inputMask id="telefone-congregacao"  maxlength="20"
+				value="#{congregacoesBean.congregacaoEdicao.telefone}" mask="(99)9999-9999"/>
+				
+				<p:outputLabel value="Email:" for="email-congregacao" style="font-weight:bold"/>
+				<p:inputText id="email-congregacao"  maxlength="30"
+				value="#{congregacoesBean.congregacaoEdicao.email}"/>
+				
+				<p:outputLabel value="Endereço:" for="endereco-congregacao" style="font-weight:bold"/>
+				<p:inputText id="endereco-congregacao"  maxlength="20"
+				value="#{congregacoesBean.congregacaoEdicao.endereco}"/>
+				
+							
+				<p:outputLabel for="cidade" value="Cidade: " style="font-weight:bold" />
+                <p:selectOneMenu id="cidade" value="#{congregacoesBean.congregacaoEdicao.cidade}" 
+                converter="converterCidade" style="width:190px" itemValue="" noSelectionOption="true" >
+                	<f:selectItem itemLabel="Selecione cidade" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{cidadesBean.cidades}" 
+                    itemLabel="#{cidade.nomeCidade}" itemValue="#{cidade}" var="cidade"/>
+                </p:selectOneMenu>
+                
+               <p:outputLabel />
+					<p:commandButton value="Salvar" id="cadastrar-button"
+					action="#{congregacoesBean.salvar}"
+					process="congregacao-dialog" update="msgs-dialog painel-dialog"
+					oncomplete="if (!args.validationFailed) PF('edicaoCongregacaoDialog').hide()" />
+												  								
+			</p:panelGrid>
+	 		</div>	
+		</p:dialog>  
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

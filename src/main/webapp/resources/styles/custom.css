@@ -1,0 +1,136 @@
+/* BASE */
+body {
+	margin: 0;
+	font-size: 13px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* TABVIEW */
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+	color: #800040;
+}
+
+@media (max-width: 640px) {
+	
+.ui-fluid .ui-dialog{
+    width: auto;
+    height: auto;
+    left: 227.5px;
+    top: 185px;
+    z-index: 9999;
+    display: block;
+    visibility: visible;
+}
+
+.ui-datatable-reflow .ui-reflow-dropdown {
+    display: none !important;
+}
+
+.ui-reflow-label{
+display: none !important;	
+}
+
+}
+/*TABELA*/
+.m{
+background-color:#ff0000;  
+color:#ffffff;
+}
+
+.f{
+background-color:#96e089;  
+color: #004080;
+}
+
+.ui-datatable .ui-widget-content {
+	border: none;
+}
+
+.ui-datatable .ui-panelgrid .ui-panelgrid-cell{
+	border: none;
+}
+
+.ui-datatable.ui-datatable tbody td {
+    border-color: wheat;
+}
+
+.ui-datatable table {
+    border-collapse: collapse ;
+    width: 100%;
+    table-layout: auto !important;
+}
+
+/*DIALOG*/
+.ui-dialog .ui-dialog-content .ui-widget .ui-widget{
+	margin: 0em;
+	max-height: 500px;
+	overflow-y: auto;
+}
+.ui-grid{
+	width: auto;
+}
+
+.ui-dialog .ui-widget-content{
+	
+}
+
+
+@media (max-width: 640px) {
+.ui-dialog .ui-dialog-content {
+	
+	visibility: visible;
+	margin-top: 0px;
+	
+	padding: 1em;
+	
+}
+.aw-content .ui-dialog {	
+	margin-left: 1px;	
+	 z-index: 9999;
+	width:345px;
+	
+	max-height: 78%;
+	overflow-y: auto;
+}
+.ui-dialog .ui-dialog-content {
+	
+	width:320px;
+	position: relative;
+	border: 0;
+	padding: .5em 1em;
+	background: none;
+	overflow: auto;
+	zoom: 1;
+}
+.ui-grid{
+	width: auto;
+}
+
+
+}
+
+
+/* PANELGRID */
+.ui-panelgrid .panelgrid-noborder .ui-grid-responsive {
+	border: none;
+				
+}
+
+@media (max-width: 640px) {
+	.ui-panelgrid.panelgrid-noborder .ui-grid-responsive .ui-grid-row {
+		border: none;		
+	}		
+}
+
+.ui-accordion .ui-accordion-content .jqplot-target {
+	
+    height: 200px;
+	width: 1000px;
+}
+
+.ui-accordion .ui-accordion-content .jqplot-target .jqplot-table-legend{
+	
+    z-index: 3;
+    left: 985px;
+    top: 20px;
+}

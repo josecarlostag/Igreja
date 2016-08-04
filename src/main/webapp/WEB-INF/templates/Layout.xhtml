@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+	<f:facet name="first">
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</f:facet>
+	<title>Cadastro</title>
+	
+	<h:outputStylesheet library="styles" name="components.css" />
+	
+	<h:outputStylesheet library="styles" name="custom.css" />
+	
+	<h:outputStylesheet library="styles" name="layout.css" />
+
+	<h:outputScript target="body" library="primefaces" name="jquery/jquery.js" />
+	<h:outputScript target="body" library="javascripts" name="app.js" />	
+					
+</h:head>
+<h:body>
+  
+		<header class="aw-topbar">
+		<h:graphicImage library="resources" name="images/logo_ijv.png"  />
+					
+		<a href="#" class="aw-toggle  js-toggle"><i class="fa  fa-bars"></i></a>
+		
+	</header>
+	
+		<aside class="aw-sidebar js-sidebar">
+			<nav class="aw-menu js-menu">
+		<ul>
+			<li  >
+			<h:link outcome="Pessoas" ><i class="fa  fa-fw fa-male"></i> Pessoas</h:link>
+			</li>
+			
+			<li  >
+			<h:link outcome="Congregacoes" ><i class="fa  fa-fw fa-slideshare"></i> Congregações</h:link>
+			</li>
+			<li>
+			<h:link outcome="Cultos" ><i class="fa  fa-fw fa-group"></i> Cultos</h:link>
+			</li>
+			<li>
+			<h:link outcome="CasaBencao" ><i class="fa  fa-fw fa-home"></i> Casa de Benção</h:link>
+			</li>
+			<li >
+			<h:link outcome="CasaCrescimento"><i class="fa  fa-fw fa-university"></i> Casa de Crescimento</h:link>
+			</li>
+			<li>
+			<h:link outcome="Licoes"><i class="fa  fa-fw fa-file-text"></i> Lições</h:link>
+			</li>
+			<li>
+			<h:link outcome="Cidades"><i class="fa  fa-fw fa-flag"></i> Cidade</h:link>
+			</li>
+			<li >
+			<h:link  outcome="Graficos"><i class="fa  fa-fw fa-pie-chart"></i> Gráficos</h:link>
+			</li>
+			<li>
+			<h:link outcome="Financeiro" ><i class="fa  fa-fw fa-building"></i> Financeiro</h:link>
+			</li>
+			<li>
+			<h:link outcome="Usuarios" ><i class="fa  fa-fw fa-user"></i> Usuários</h:link>
+			</li>
+			<li>
+			<h:link outcome="index"><i class="fa  fa-fw fa-power-off"></i> Sair</h:link>
+			</li>
+		
+		</ul>
+	
+	</nav>
+		
+		</aside>
+		
+		<section class="aw-content  js-content">
+		
+		
+		<ui:insert name="content" />
+	
+							
+		<div id="conteudo">	
+	   
+		 <ui:insert name="corpo"/>
+		
+									
+		</div>
+		</section>
+		
+		<section class="aw-rodape  js-rodape">
+			<div style="float: right; margin-right: 20px">
+				<span style="float: left; height: 20px; line-height: 20px; margin-top: 10px">
+				Olá #{seguranca.nomeUsuario}<br/>
+				Congregação: #{seguranca.congregacao.nomeCongregacao}<br/>
+				Perfil: #{seguranca.perfil}<br/>
+				</span> 
+			</div>
+						
+			<footer>	
+				José Carlos Araújo da Silva.<br/>
+				Celular: (61)99636-3614		<br/>					
+			</footer>
+		</section>
+		
+		
+		<h:form>
+			<p:confirmDialog global="true">
+			
+				<p:commandButton value="Não" type="button" 
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+				
+				<p:commandButton value="Sim" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+			
+			</p:confirmDialog>
+		
+		
+		
+		</h:form>
+		
+</h:body>
+</html>

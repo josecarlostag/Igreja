@@ -1,0 +1,65 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+    
+    <beans:bean id="appUserDetailsService" class="br.org.ijv.cadastro.security.AppUserDetailsService" />
+    
+    <beans:bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+	    <beans:property name="accessDeniedHandler" ref="jsfAccessDeniedHandler"/>
+	    <beans:property name="authenticationEntryPoint" ref="authenticationEntryPoint"/>
+	</beans:bean>
+	
+	<beans:bean id="jsfAccessDeniedHandler" class="br.org.ijv.cadastro.security.JsfAccessDeniedHandler">
+	    <beans:property name="loginPath" value="/AcessoNegado.xhtml" />
+	    <beans:property name="contextRelative" value="true" />
+	</beans:bean>
+	
+	<beans:bean id="authenticationEntryPoint" class="br.org.ijv.cadastro.security.JsfLoginUrlAuthenticationEntryPoint">
+	    <beans:property name="loginFormUrl" value="/index.xhtml"/>
+	    <beans:property name="redirectStrategy" ref="jsfRedirectStrategy" />
+	</beans:bean>
+	
+	
+	
+	<beans:bean id="jsfRedirectStrategy" class="br.org.ijv.cadastro.security.JsfRedirectStrategy"/>
+    
+    <http pattern="/index.xhtml" security="none"/>
+    <http pattern="/Erro.xhtml" security="none"/>
+    <http pattern="/AcessoNegado.xhtml" security="none" />
+    <http pattern="/javax.faces.resource/**" security="none" />
+    
+	<http auto-config="false" use-expressions="true">
+		
+		<custom-filter ref="exceptionTranslationFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+		
+		<intercept-url pattern="/Menu.xhtml" access="isAuthenticated()" />
+		<intercept-url pattern="/Genealogia.xhtml" access="isAuthenticated()" />
+  		<intercept-url pattern="/Graficos.xhtml" access="isAuthenticated()" />
+  		<intercept-url pattern="/CasaBencao.xhtml" access="isAuthenticated()" />
+  		<intercept-url pattern="/CasaCrescimento.xhtml" access="isAuthenticated()" />
+		<intercept-url pattern="/Pessoas.xhtml" access="hasAnyRole('PASTORES', 'ADMINISTRADORES')" />
+		<intercept-url pattern="/Financeiro.xhtml" access="hasAnyRole('PASTORES', 'ADMINISTRADORES')" />		
+		<intercept-url pattern="/Cidades.xhtml" access="isAuthenticated()"/>
+		<intercept-url pattern="/Licoes.xhtml" access="isAuthenticated()"  />
+		<intercept-url pattern="/Congregacoes.xhtml" access="isAuthenticated()"/>
+		<intercept-url pattern="/Cultos.xhtml" access="isAuthenticated()"/>
+		<intercept-url pattern="/Usuarios.xhtml" access="hasAnyRole('ADMINISTRADORES')" />
+		<intercept-url pattern="/**" access="denyAll" />
+	
+		<form-login login-page="/index.xhtml" authentication-failure-url="/index.xhtml?invalid=true" 
+			default-target-url="/" always-use-default-target="true" />
+		<logout logout-url="/j_spring_security_logout" invalidate-session="true" />
+			
+	</http>
+	
+	<authentication-manager>
+		<authentication-provider user-service-ref="appUserDetailsService">
+			<!-- <password-encoder hash="md5" /> -->
+		</authentication-provider>
+	</authentication-manager>
+           
+</beans:beans>

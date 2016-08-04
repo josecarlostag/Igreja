@@ -1,0 +1,50 @@
+@charset "utf-8";
+
+body {
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 1px;
+	color: #8e2442;
+	font-weight: normal
+}
+
+header {
+	padding: 1px;
+	margin-bottom: 6px;
+	height: 95px;	
+	background-color: #8080ff;
+	color: #ffffff;
+	box-shadow: 1px 20px 40px #8080ff
+}
+
+
+
+#conteudo {
+	padding: 19px 5px
+}
+
+footer {
+	border-top: 8px solid #fa1d43;
+	padding: 0px 8px;
+	margin-top: 5px;
+	margin-bottom: 10px
+}
+
+
+
+#login-dialog {
+	width: 270px;
+	margin: auto;
+	margin-top: 8px;
+}
+
+.grid-login {
+	background-color: #8080ff;
+	border-radius: 8px;
+	border: 1px solid #8080ff;
+	margin-top: 4px;
+	padding: 10px
+	width: 100% 
+	
+}
+

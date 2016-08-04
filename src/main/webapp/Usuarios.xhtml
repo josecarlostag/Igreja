@@ -1,0 +1,186 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+		<f:metadata> 
+	    	   	<f:viewAction action="#{usuariosBean.consultar}"/> 
+	    	   	<f:viewAction action="#{gruposBean.consultar}"/>
+	    	   	 
+	 	</f:metadata> 
+	 	
+ 	<h1 class="aw-page-title">Consulta usuários</h1> 
+ 	 	 
+ 	<h:form id="frm-usuario"> 
+ 		
+ 		<p:messages id="msgs"/>
+	
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Novo usuário" icon="ui-icon-person" 
+	  		action="#{usuariosBean.prepararNovoCadastro}" 
+			process="@this" update="usuario-dialog"
+			oncomplete="PF('edicaoUsuarioDialog').show()"
+			disabled="#{usuariosBean.usuarioSelecionado != null}">
+			<p:resetInput target="usuario-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this" update="usuario-dialog"
+					oncomplete="PF('edicaoUsuarioDialog').show()"
+	         		disabled="#{usuariosBean.usuarioSelecionado == null}">
+	         		
+	         		<f:setPropertyActionListener value="#{usuariosBean.usuarioSelecionado}" 
+	         		target="#{usuariosBean.usuarioEdicao}"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="usuarios-table msgs toolbar"
+	         		action="#{usuariosBean.excluir}"
+					disabled="#{usuariosBean.usuarioSelecionado == null}">
+					
+						<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir este usuário"/>
+					
+					</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para XLS"
+	         			ajax="false" immediate="true">
+	         			<p:dataExporter type="xls" target="usuarios-table" fileName="usuarios"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	
+     	<p:dataTable value="#{usuariosBean.todosUsuarios}" 
+     	var="usuario" border="1" cellspacing="0" cellpadding="2"
+ 		emptyMessage="Nenhum usuário cadastrado" rows="10" 
+ 		paginator="true" paginatorPosition="bottom" 
+ 		style="margin-top: 10px" id="usuarios-table"
+ 		selection="#{usuariosBean.usuarioSelecionado}"
+ 		selectionMode="single" rowKey="#{usuario.id}" reflow="true">  
+ 		
+ 		<p:ajax event="rowSelect" update=":frm-usuario:toolbar"/>
+		<p:ajax event="rowUnselect" update=":frm-usuario:toolbar"/>
+   			
+  			<p:column width="105" headerText="Login" sortBy="#{usuario.login}"> 			 
+	  			<h:outputText value="#{usuario.login}"/>  
+			</p:column>
+			
+			<p:column width="65" headerText="Perfil" sortBy="#{usuario.perfil}"> 
+	  			<h:outputText value="#{usuario.perfil}"/>  
+			</p:column>
+			
+			
+			
+			<p:column headerText="Nome Usuário" sortBy="#{usuario.nomeUsuario}" width="120">  
+	  			<h:outputText value="#{usuario.nomeUsuario}"/>  
+			</p:column>
+			
+ 			<p:column width="95" headerText="Telefone"> 
+	 			<h:outputText value="#{usuario.telefone}"/>    
+			</p:column> 
+			
+	 		<p:column width="125" headerText="RG"> 
+				<h:outputText value="#{usuario.rg}"/>   
+			</p:column>
+			 
+			<p:column width="170" headerText="Email">  
+				<h:outputText value="#{usuario.email}"/>    
+			</p:column>
+			
+			<p:column width="90" headerText="Congregação"> 
+				<h:outputText value="#{usuario.congregacao.nomeCongregacao}"/>    
+			</p:column>
+			
+			<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(usuariosBean.usuarios)}" /> 
+			<h:outputText value=" usuários cadastrados. " />
+			</f:facet>
+			 	 			 		
+	 	</p:dataTable>  
+	 			
+	 	<p:dialog header="Usuário" widgetVar="edicaoUsuarioDialog" showEffect="explode" 
+	 	id="usuario-dialog" resizable="false" modal="true" closeOnEscape="true">
+		
+			<p:messages id="msgs-dialog" />
+			<p:defaultCommand target="cadastrar-button" scope="usuario-dialog"/>
+			
+			<div class="ui-fluid">
+			
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-4, ui-grid-col-8" id="painel-dialog">
+								
+				<p:outputLabel value="Perfil: " for="perfil" style="font-weight:bold"/>
+					<p:selectOneMenu id="perfil" value="#{usuariosBean.usuarioEdicao.perfil}">
+						<f:selectItem itemLabel="Selecione perfil" />
+						<f:selectItems value="#{usuariosBean.perfilUsuario}" var="perfil"
+						itemLabel="#{perfil.descricao}" itemValue="#{perfil}" />
+					</p:selectOneMenu>
+					
+						
+  				<p:outputLabel value="Login: " for="login-usuario" style="font-weight:bold"/> 
+				<p:inputText id="login-usuario"   maxlength="18"
+				value="#{usuariosBean.usuarioEdicao.login}"/>
+				
+				<p:outputLabel value="Senha: " for="senha-usuario" style="font-weight:bold"/>
+				<p:password id="senha-usuario"  maxlength="10"
+				value="#{usuariosBean.usuarioEdicao.senha}"/>
+				 
+				<p:outputLabel value="Nome: " for="nome-usuario" style="font-weight:bold" /> 
+				<p:inputText id="nome-usuario"   maxlength="30" 
+				value="#{usuariosBean.usuarioEdicao.nomeUsuario}"/> 
+				 				
+				<p:outputLabel value="RG: " for="rg-usuario" style="font-weight:bold"/> 
+				<p:inputText id="rg-usuario"  maxlength="20"
+				value="#{usuariosBean.usuarioEdicao.rg}"/>
+				
+				<p:outputLabel value="Email: " for="email-usuario" style="font-weight:bold"/>
+				<p:inputText id="email-usuario"  maxlength="30"
+				value="#{usuariosBean.usuarioEdicao.email}" />
+				
+				<p:outputLabel value="Telefone:" for="telefone" style="font-weight:bold"/>
+				<p:inputMask id="telefone"  maxlength="20"
+				value="#{usuariosBean.usuarioEdicao.telefone}" mask="(99)9999-9999"/>
+								 
+				 <p:outputLabel value="Congregação: "  for="congregacao" style="font-weight:bold"/>
+                <p:selectOneMenu id="congregacao" value="#{usuariosBean.usuarioEdicao.congregacao}" 
+                converter="converterCongregacao"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione congregação" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{congregacoesBean.congregacoes}" 
+                    itemLabel="#{congregacao.nomeCongregacao}" itemValue="#{congregacao}" var="congregacao"/>
+                </p:selectOneMenu>
+                
+                 <p:outputLabel value="Grupo: "  for="grupo" style="font-weight:bold"/>
+                <p:selectOneMenu id="grupo" value="#{usuariosBean.usuarioEdicao.grupos}" 
+                converter="converterUsuario"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione grupo" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{gruposBean.grupos}" 
+                    itemLabel="#{grupo.descricao}" itemValue="#{grupo}" var="grupo"/>
+                </p:selectOneMenu>
+						
+				<p:outputLabel /> 
+				<p:commandButton value="Salvar"  id="cadastrar-button"
+					action="#{usuariosBean.salvar}"
+					process="usuario-dialog" update="msgs-dialog painel-dialog"
+					oncomplete="if (!args.validationFailed) PF('edicaoUsuarioDialog').hide()"/> 
+					
+				</p:panelGrid>
+	 		</div>		
+		</p:dialog> 
+		
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

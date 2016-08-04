@@ -1,0 +1,129 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{cidadesBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Consulta cidades</h1> 
+ 	
+ 	<h:form id="frm-cidade"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Nova cidade" icon="ui-icon-flag" 
+			action="#{cidadesBean.prepararNovoCadastro}"
+			process="@this"  update="cidade-dialog"
+			
+			oncomplete="PF('edicaoCidadeDialog').show()"
+			disabled="#{cidadesBean.cidadeSelecionada != null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+			
+			<p:resetInput target="cidade-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this"  update="cidade-dialog"
+	         		oncomplete="PF('edicaoCidadeDialog').show()"
+	         		disabled="#{cidadesBean.cidadeSelecionada == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+	         		<p:resetInput target="cidade-dialog" />
+	         		
+	         		<f:setPropertyActionListener value="#{cidadesBean.cidadeSelecionada}" 
+	         		target="#{cidadesBean.cidadeEdicao}" />
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="cidades-table msgs toolbar"
+	         		action="#{cidadesBean.excluir}"
+	         		disabled="#{cidadesBean.cidadeSelecionada == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+	         		
+	         			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir esta cidade"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para PDF" 
+						ajax="false" immediate="true" >
+	         			<p:dataExporter type="pdf" target="cidades-table" fileName="cidades"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	
+   	<p:dataTable value="#{cidadesBean.todasCidades}" var="cidade" border="1" cellspacing="0" cellpadding="2"
+	emptyMessage="Nenhuma cidade cadastrada." rows="10" paginator="true" paginatorPosition="bottom" style="margin-top: 10px" 
+	id="cidades-table" selection="#{cidadesBean.cidadeSelecionada}" selectionMode="single" rowKey="#{cidade.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-cidade:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-cidade:toolbar"/>
+  			
+		<p:column  headerText="Cidade" sortBy="#{cidade.nomeCidade}">
+  			<h:outputText value="#{cidade.nomeCidade}"/>  
+		</p:column>
+			
+		<p:column headerText="Estado" sortBy="#{cidade.estado}" width="83"> 
+	  		<h:outputText value="#{cidade.estado}"/>  
+		</p:column>
+		
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(cidadesBean.cidades)}" /> 
+			<h:outputText value=" cidades cadastradas. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>  
+		
+		
+	 	<p:dialog header="Cadastro de cidades" widgetVar="edicaoCidadeDialog"  showEffect="explode" hideEffect="bounce"
+	 	id="cidade-dialog" resizable="false" modal="true" closeOnEscape="true">
+		
+			<p:messages id="msgs-dialog"/>
+			<p:defaultCommand target="cadastrar-button" scope="cidade-dialog"/>
+			
+			<div class="ui-fluid">
+			
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-4, ui-grid-col-8" id="painel-dialog">
+			
+				<p:outputLabel value="Cidade:" for="cidade" style="font-weight:bold"/>
+				<p:inputText id="cidade"  maxlength="30"
+				value="#{cidadesBean.cidadeEdicao.nomeCidade}"/>
+				
+							
+				<p:outputLabel for="estado" value="Estado:" style="font-weight:bold"/>
+                <p:selectOneMenu id="estado" value="#{cidadesBean.cidadeEdicao.estado}" 
+                  itemValue="" noSelectionOption="true" >
+                	<f:selectItem itemLabel="Selecione estado" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{cidadesBean.estados}" 
+                    itemLabel="#{estado.descricao}" itemValue="#{estado}" var="estado"/>
+                </p:selectOneMenu>
+                
+       						                 			     										
+			<h:outputText />
+					<p:commandButton value="Salvar" id="cadastrar-button"
+					action="#{cidadesBean.salvar}"
+					process="cidade-dialog" update="msgs-dialog painel-dialog"
+					oncomplete="if (!args.validationFailed) PF('edicaoCidadeDialog').hide()" />
+												  								
+			</p:panelGrid>
+	 		</div>
+	 			
+		</p:dialog>  
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

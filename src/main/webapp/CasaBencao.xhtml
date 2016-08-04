@@ -1,0 +1,284 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{casasBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Consulta Casa de Benção</h1> 
+ 	
+ 	<h:form id="frm-casa-bencao"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Nova casa de benção" icon="ui-icon-flag" 
+			action="#{casasBean.prepararNovaCasaBencao}"
+			process="@this"  update="casa-bencao-dialog"
+			
+			oncomplete="PF('edicaoCasaBencaoDialog').show()"
+			disabled="#{casasBean.casaSelecionada != null}">
+			
+			<p:resetInput target="casa-bencao-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this"  update="casa-bencao-dialog"
+	         		oncomplete="PF('edicaoCasaBencaoDialog').show()"
+	         		disabled="#{casasBean.casaSelecionada == null}">
+	         		
+	         		<p:resetInput target="casa-bencao-dialog" />
+	         		
+	         		<f:setPropertyActionListener value="#{casasBean.casaSelecionada}" 
+	         		target="#{casasBean.casaEdicao}" />
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="casas-bencao-table msgs toolbar"
+	         		action="#{casasBean.excluir}"
+	         		disabled="#{casasBean.casaSelecionada == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+	         		
+	         			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir esta casa de benção"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para xls" 
+						ajax="false" immediate="true" >
+	         			<p:dataExporter type="xls" target="casas-bencao-table" fileName="casasBencaos"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	
+   	<p:dataTable value="#{casasBean.casasBencaosCongregacao}" var="casabencao" border="1" cellspacing="0" cellpadding="2"
+	emptyMessage="Nenhuma casa de benção cadastrada." rows="10" paginator="true" paginatorPosition="bottom" style="margin-top: 10px" 
+	id="casas-bencao-table" selection="#{casasBean.casaSelecionada}" selectionMode="single" rowKey="#{casabencao.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-casa-bencao:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-casa-bencao:toolbar"/>
+	
+		<p:column  headerText="Série"  width="120" filterBy="#{casabencao.serie.nomeSerie}">
+  			<h:outputText value="#{casabencao.serie.nomeSerie}"/>  
+		</p:column>
+		 			
+		<p:column  headerText="Lider"  width="120">
+  			<h:outputText value="#{casabencao.lider.nome}"/>  
+		</p:column>
+		
+		<p:column headerText="Anfitrião"  width="120">  
+	  			<h:outputText value="#{casabencao.anfitriao}"/>  
+		</p:column>
+		
+		<p:column headerText="Telefone"  width="90">  
+	  			<h:outputText value="#{casabencao.telefoneResid}"/>  
+			</p:column>
+			
+		<p:column headerText="Celular"  width="90">  
+	  			<h:outputText value="#{casabencao.celular}"/>  
+			</p:column>	
+			
+		<p:column headerText="Telefone Trab"  width="90" priority="4">  
+	  			<h:outputText value="#{casabencao.telefoneTrab}"/>  
+			</p:column>		
+			
+		<p:column headerText="Email"  width="160" priority="6">  
+	  			<h:outputText value="#{casabencao.email}"/>  
+		</p:column>
+		
+		<p:column headerText="Endereço"  width="120">  
+	  			<h:outputText value="#{casabencao.endereco}"/>  
+		</p:column>
+		
+		<p:column headerText="Bairro"  width="160">  
+	  			<h:outputText value="#{casabencao.bairro}"/>  
+		</p:column>
+
+		<p:column headerText="Cidade"  width="100">  
+	  			<h:outputText value="#{casabencao.cidade.nomeCidade}"/>  
+		</p:column>	
+		
+		<p:column headerText="Estado"  width="60">  
+	  			<h:outputText value="#{casabencao.cidade.estado}"/>  
+		</p:column>	
+
+		<p:column headerText="Ministrante"  width="100" priority="3">  
+	  			<h:outputText value="#{casabencao.ministrante.nome}"/>  
+		</p:column>	
+		
+		<p:column headerText="Dia da Semana"  width="100">  
+	  			<h:outputText value="#{casabencao.dia_semana}"/>  
+		</p:column>	
+		
+		<p:column headerText="Horário"  width="100">  
+	  			<h:outputText value="#{casabencao.horario}"/>  
+		</p:column>	
+			
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(casasBean.casasBencaosCongregacao)}" /> 
+			<h:outputText value=" casas de benção cadastradas. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>  
+		
+		
+	 	<p:dialog  header="Cadastro casa de benção" widgetVar="edicaoCasaBencaoDialog" showEffect="explode" 
+	 	id="casa-bencao-dialog" resizable="false" modal="true" closeOnEscape="true" responsive="true">
+		
+		<p:messages id="msgs-dialog"/>
+		<p:defaultCommand target="cadastrar-button" scope="casa-bencao-dialog"/>
+						
+			<p:tabView style="margin-top: 4px" id="painel-dialog">
+			
+			<p:tab title="Anfitrião">
+			   <div class="ui-fluid">
+            	<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-4, ui-grid-col-8" >  
+                
+            		<p:outputLabel value="Anfitrião" for="anfitriao" style="font-weight:bold"/>
+					<p:inputText id="anfitriao"  maxlength="50"
+					value="#{casasBean.casaEdicao.anfitriao}"/>
+				
+					<p:outputLabel value="Telefone(res):" for="telefone-res" style="font-weight:bold"/>
+					<p:inputMask id="telefone-res" size="20" maxlength="20"
+					value="#{casasBean.casaEdicao.telefoneResid}" mask="(99)9999-9999"/>
+				
+					<p:outputLabel value="Celular:" for="celular" style="font-weight:bold"/>
+					<p:inputMask id="celular" size="20" maxlength="20"
+					value="#{casasBean.casaEdicao.celular}" mask="(99)9999-9999"/>
+					
+					
+					<p:outputLabel value="Telefone(trab):" for="telefone-trab" style="font-weight:bold"/>
+					<p:inputMask id="telefone-trab" size="20" maxlength="20"
+					value="#{casasBean.casaEdicao.telefoneTrab}" mask="(99)9999-9999"/>
+				
+				 	<p:outputLabel value="Email" for="email" style="font-weight:bold"/>
+					<p:inputText id="email"  maxlength="40"
+					value="#{casasBean.casaEdicao.email}"/>
+				   				
+					<p:outputLabel value="Endereço" for="endereco" style="font-weight:bold"/>
+					<p:inputText id="endereco"  maxlength="80"
+					value="#{casasBean.casaEdicao.endereco}"/>
+					
+					<p:outputLabel value="Bairro" for="bairro" style="font-weight:bold"/>
+					<p:inputText id="bairro" size="20" maxlength="40"
+					value="#{casasBean.casaEdicao.bairro}"/>
+				
+					<p:outputLabel value="Cidade: "  for="cidade" style="font-weight:bold"/>
+	                <p:selectOneMenu id="cidade" value="#{casasBean.casaEdicao.cidade}" 
+	                converter="converterCidade" style="width:145px" itemValue="" noSelectionOption="true">
+	                	<f:selectItem itemLabel="Selecione cidade" itemValue="" noSelectionOption="true" />
+	                    <f:selectItems value="#{cidadesBean.cidades}" 
+	                    itemLabel="#{cidade.nomeCidade}" itemValue="#{cidade}" var="cidade"/>
+	                    
+	                </p:selectOneMenu>
+                
+                </p:panelGrid>
+				</div>
+			</p:tab>
+			
+			<p:tab title="Lider">
+				<div class="ui-fluid">
+				<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-4, ui-grid-col-8" >
+								 	
+	                <p:outputLabel value="Lider: "  for="lider" style="font-weight:bold"/>	
+	                                            
+	                <p:selectOneMenu id="lider" value="#{casasBean.casaEdicao.lider}" 
+	                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+	                	
+	                	<f:selectItem itemLabel="Selecione lider" itemValue="" noSelectionOption="true" />
+	                    <f:selectItems value="#{pessoaBean.membros}" 
+	                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+	                    
+	                </p:selectOneMenu>
+                               
+	                <p:outputLabel value="Ministrante: "  for="ministrante" style="font-weight:bold"/>
+	                <p:selectOneMenu id="ministrante" value="#{casasBean.casaEdicao.ministrante}" 
+	                converter="converterPessoa" itemValue="" noSelectionOption="true">
+	                
+	                	<f:selectItem itemLabel="Selecione ministrante" itemValue="" noSelectionOption="true" />
+	                    <f:selectItems value="#{pessoaBean.membros}" 
+	                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+	                    
+	                </p:selectOneMenu>
+	                
+                 	<p:outputLabel value="Congregacao: "  for="congregacao" style="font-weight:bold"/>
+	               	<p:selectOneMenu id="congregacao" value="#{casasBean.casaEdicao.congregacao}" 
+	               	converter="converterCongregacao"  itemValue="" noSelectionOption="true">
+	               	
+	               		<f:selectItem itemLabel="Selecione congregacao" itemValue="" noSelectionOption="true" />
+	                   	<f:selectItems value="#{congregacoesBean.congregacaoUsuario}" 
+	                   	itemLabel="#{congregacao.nomeCongregacao}" itemValue="#{congregacao}" var="congregacao"/>
+	                   
+	               	</p:selectOneMenu>
+	                
+                </p:panelGrid>
+                </div>
+            </p:tab>
+										
+			<p:tab title="Lição">
+			<div class="ui-fluid">
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-2, ui-grid-col-10" > 
+			
+				<p:outputLabel value="Tipo:" for="tipo" style="font-weight:bold" />
+        		<h:selectOneRadio  id="tipo" value="#{casasBean.casaEdicao.tipo}" disabled="true"  columns="2" >         					
+					<f:selectItems value="#{casasBean.tipoCasa}" var="tipoCasa"
+					itemLabel="#{tipoCasa.descricao}" itemValue="#{tipo}"/> 
+				</h:selectOneRadio>
+								
+			 	<p:outputLabel value="Série: "  for="serie" style="font-weight:bold"/>
+                <p:selectOneMenu id="serie" value="#{casasBean.casaEdicao.serie}" 
+                converter="converterSerie" style="width:145px" itemValue="" noSelectionOption="true">
+                
+                	<f:selectItem itemLabel="Selecione série" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{seriesBean.todasSeries}" 
+                    itemLabel="#{serie.nomeSerie}" itemValue="#{serie}" var="serie"/>
+                    
+                </p:selectOneMenu>
+			   	
+				<p:outputLabel value="Dia Semana:" for="semana" style="font-weight:bold"/>
+        		<h:selectOneRadio  id="semana" value="#{casasBean.casaEdicao.dia_semana}"  columns="2">         					
+					<f:selectItems value="#{casasBean.diaSemana}" var="diaSemana"
+					itemLabel="#{diaSemana}" itemValue="#{semana}"  /> 
+				</h:selectOneRadio>
+				
+				
+				<p:outputLabel value="Horário: " for="horario" style="font-weight:bold"/>
+				<p:calendar id="horario" size="10" maxlength="10" value="#{casasBean.casaEdicao.horario}"
+				pattern="hh:mm" mask="99:99"/>
+				
+				
+       
+            </p:panelGrid>
+            </div>
+		</p:tab>
+	</p:tabView>	
+    			                 			     										
+			<p:outputLabel />
+					<p:commandButton value="Salvar" id="cadastrar-button"
+					action="#{casasBean.salvar}"
+					process="casa-bencao-dialog" update="msgs-dialog painel-dialog"
+					oncomplete="if (!args.validationFailed) PF('edicaoCasaBencaoDialog').hide()" />
+												  									 			
+		</p:dialog>  
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

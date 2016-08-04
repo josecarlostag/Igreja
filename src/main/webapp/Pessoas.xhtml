@@ -1,0 +1,446 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+			
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{pessoaBean.consultar}"/> 
+    	   	  <f:viewAction action="#{congregacoesBean.consultar}"/>  	    
+ 	</f:metadata> 
+ 	
+ 	<h1 class="aw-page-title">Consulta pessoas</h1> 
+ 	 	
+ 	<h:form id="frm-pessoa" enctype="multipart/form-data">
+ 		
+ 		<p:messages id="msgs"/>
+	
+			<p:toolbar id="toolbar">
+				<f:facet name="left">
+				<p:commandButton value="Nova pessoa" icon="ui-icon-cart"
+					action="#{pessoaBean.prepararNovoCadastro}"
+					process="@this" update="pessoa-dialog"
+					oncomplete="PF('edicaoPessoaDialog').show()"
+					disabled="#{pessoaBean.pessoaSelecionada != null}">
+					
+					<p:resetInput target="pessoa-dialog"/>
+				</p:commandButton>
+					
+					<span class="ui-separator">
+						<span class="ui-icon ui-icon-grip-dotted-vertical" />
+            		</span>
+            		
+            		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+					process="@this" update="pessoa-dialog"
+					oncomplete="PF('edicaoPessoaDialog').show()"
+            		disabled="#{pessoaBean.pessoaSelecionada == null}">
+            		
+            		<f:setPropertyActionListener value="#{pessoaBean.pessoaSelecionada}" 
+	         		target="#{pessoaBean.pessoaEdicao}"/>
+            		
+            		</p:commandButton>
+            		
+            		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+            		process="@this" update="pessoas-table msgs toolbar"
+	          		action="#{pessoaBean.excluir}"
+            		disabled="#{pessoaBean.pessoaSelecionada == null}">
+            		
+            			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir esta pessoa"/>
+            		
+            		</p:commandButton>
+            		
+            		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para XLS"
+            			ajax="false" immediate="true">
+	         			<p:dataExporter type="xls" target="pessoas-table" fileName="pessoas"/>
+	         		</p:commandButton>
+            		           		
+				</f:facet>
+			</p:toolbar>
+			
+			
+			<p:dataTable  value="#{pessoaBean.membrosCongregacao}" var="pessoa" widgetVar="pessoasTable" border="1" cellspacing="0" cellpadding="2"
+			emptyMessage="Nenhuma pessoa cadastrada." rows="20" paginator="true" paginatorPosition="bottom" id="pessoas-table" style="margin-top: 10px" 
+			selection="#{pessoaBean.pessoaSelecionada}"  selectionMode="single" rowKey="#{pessoa.id}"  reflow="true"  
+			rowStyleClass="#{pessoa.sexo == 'MASCULINO' ?'m':'f'}">
+					
+			<p:ajax event="rowSelect" update=":frm-pessoa:toolbar"/>
+			<p:ajax event="rowUnselect" update=":frm-pessoa:toolbar"/> 
+			
+			<f:facet name="header">
+       		 Lista de Membros
+       		   		
+            <p:outputPanel>
+                <h:outputText value="Selecione:" />
+                <p:inputText id="globalFilter" onkeyup="PF('pessoasTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+            </p:outputPanel>
+            
+       		 </f:facet>
+        
+       		<p:column style="width:10px">
+            <p:rowToggler />   		
+        	</p:column>
+       				
+  			<p:column filterBy="#{pessoa.nomeCompleto}" width="200" headerText="Nome completo" sortBy="#{pessoa.nome}"  > 			 
+	  			<h:outputText value="#{pessoa.nomeCompleto}"/>  
+			</p:column>
+						
+			<p:column headerText="Telefone"  width="90">  
+	  			<h:outputText value="#{pessoa.telefoneResid}"/>  
+			</p:column>
+			
+			<p:column headerText="Celular"  width="90">  
+	  			<h:outputText value="#{pessoa.celular}"/>  
+			</p:column>
+			
+			<p:column filterBy="#{pessoa.discipulador.nome}" width="110" headerText="Discipulador" sortBy="#{pessoa.discipulador.nome}" priority="4"> 			 
+	  			<h:outputText value="#{pessoa.discipulador.nome}"/>  
+			</p:column>
+			
+			<p:column filterBy="#{pessoa.pastor.nome}" width="110" headerText="Pastor" sortBy="#{pessoa.pastor.nome}" priority="6"> 			 
+	  			<h:outputText value="#{pessoa.pastor.nome}"/>  
+			</p:column>
+							
+			<p:column filterBy="#{pessoa.congregacao.nomeCongregacao}" headerText="Congregação" width="100"> 
+	  			<h:outputText value="#{pessoa.congregacao.nomeCongregacao}"/>  
+			</p:column>
+			
+			<p:column filterBy="#{pessoa.sexo}" headerText="Sexo" width="100" sortBy="#{pessoa.sexo}"> 				   		
+	   			<h:outputText value="#{pessoa.sexo}"/>   
+			</p:column> 
+			
+			<p:column filterBy="#{pessoa.estado_civil}" headerText="Estado civil" width="100" sortBy="#{pessoa.estado_civil}" priority="2"> 				   		
+	   			<h:outputText value="#{pessoa.estado_civil}"/>   
+			</p:column> 
+			
+			<p:column filterBy="#{pessoa.funcao}" headerText="Função" width="100" sortBy="#{pessoa.funcao}"> 				   		
+	   			<h:outputText value="#{pessoa.funcao}"/>   
+			</p:column> 
+			
+			<p:column headerText="Email"  width="160">  
+	  			<h:outputText value="#{pessoa.email}"/>  
+			</p:column>
+					
+			<p:column filterBy="#{pessoa.bairro}" headerText="Bairro" sortBy="#{pessoa.bairro}" width="100">  
+	  			<h:outputText value="#{pessoa.bairro}"/>  
+			</p:column>
+			
+			<p:column filterBy="#{pessoa.cidade.nomeCidade}" headerText="Cidade" sortBy="#{pessoa.cidade.nomeCidade}" width="100">  
+	  			<h:outputText value="#{pessoa.cidade.nomeCidade}"/>  
+			</p:column>
+						
+			<p:column filterBy="#{pessoa.cidade.estado}" headerText="Estado" sortBy="#{pessoa.cidade.estado}" width="100">  
+	  			<h:outputText value="#{pessoa.cidade.estado}"/>  
+			</p:column>
+			
+			<p:column filterBy="#{pessoa.status}" headerText="Status" sortBy="#{pessoa.status}" width="90">  
+	  			<h:outputText value="#{pessoa.status}"/>  
+			</p:column>
+			
+			<p:rowExpansion >
+			
+		<p:panelGrid  columns="4"  columnClasses="ui-grid-col-1, ui-grid-col-2, ui-grid-col-2,ui-grid-col-7" reflow="true" >
+		
+         	<p:column	 >
+   				<p:graphicImage name="images/#{pessoa.id}foto.jpg"  style="width: 110px; height: 147px;" title="#{pessoa.nome}" />   			
+   			</p:column>
+					
+			<p:column>	
+				<h:outputText value="Nome: " style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.nomeCompleto}" /><br/>
+					 
+      			<h:outputText value="Endereço:	" style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.endereco}" /><br/>
+               	
+               	<h:outputText value="Email:	" style="font-weight:bold" />
+         		<h:outputText  value="#{pessoa.email}" /><br/>
+ 				
+               	<h:outputText value="Telefone(res): " style="font-weight:bold" />
+               	<h:outputText value="#{pessoa.telefoneResid}" /><br/>
+               
+               	<h:outputText value="Celular: " style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.celular}" /><br/>
+               
+               	<h:outputText value="Telefone(trab): " style="font-weight:bold" />
+               	<h:outputText value="#{pessoa.telefoneTrab}" /><br/>
+               	
+               	<h:outputText value="Nascimento: " style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.dataNascimento}">
+  				<f:convertDateTime pattern="dd/MM/yyyy" 
+  				timeZone="America/Sao_Paulo" /><br/> 
+  				</h:outputText><br/>
+               
+               	<h:outputText value="Conversção: " style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.dataConversao}">
+  				<f:convertDateTime pattern="dd/MM/yyyy" 
+  				timeZone="America/Sao_Paulo" /><br/> 
+  				</h:outputText><br/>
+              
+               	<h:outputText value="Batismo: " style="font-weight:bold"/>
+                <h:outputText value="#{pessoa.dataBatismo}"><br/>
+	  			<f:convertDateTime pattern="dd/MM/yyyy" 
+	  			timeZone="America/Sao_Paulo" /> 
+	  			</h:outputText> <br/>
+		  			
+	  			<h:outputText value="Status: " style="font-weight:bold" />
+               	<h:outputText value="#{pessoa.status}" /><br/>
+                	
+  			</p:column>
+  			 
+  			<p:column>
+		  			
+	  			<h:outputText value="Cônjuge: " style="font-weight:bold"/>
+	            <h:outputText value="#{pessoa.conjuge.nome}" /><br/>
+	              	
+	  			<h:outputText value="Endereço:	" style="font-weight:bold"/>
+              	<h:outputText value="#{pessoa.conjuge.endereco}" /><br/>
+	             
+              	<h:outputText value="Email:	" style="font-weight:bold" />
+           		<h:outputText  value="#{pessoa.conjuge.email}" /><br/>
+				
+              	<h:outputText value="Telefone(res): " style="font-weight:bold" />
+              	<h:outputText value="#{pessoa.conjuge.telefoneResid}" /><br/>
+              
+              	<h:outputText value="Celular: " style="font-weight:bold"/>
+              	<h:outputText value="#{pessoa.conjuge.celular}" /><br/>
+	              
+              	<h:outputText value="Telefone(trab): " style="font-weight:bold" />
+              	<h:outputText value="#{pessoa.conjuge.telefoneTrab}" /><br/>
+              	
+              	<h:outputText value="Nascimento: " style="font-weight:bold"/>
+              	<h:outputText value="#{pessoa.conjuge.dataNascimento}">
+ 				<f:convertDateTime pattern="dd/MM/yyyy" 
+ 				timeZone="America/Sao_Paulo" /><br/> 
+ 				</h:outputText><br/>
+               
+               	<h:outputText value="Conversão: " style="font-weight:bold"/>
+               	<h:outputText value="#{pessoa.conjuge.dataConversao}">
+  				<f:convertDateTime pattern="dd/MM/yyyy" 
+  				timeZone="America/Sao_Paulo" /><br/> 
+  				</h:outputText><br/>
+              
+               	<h:outputText value="Batismo: " style="font-weight:bold"/>
+                <h:outputText value="#{pessoa.conjuge.dataBatismo}"><br/>
+	  			<f:convertDateTime pattern="dd/MM/yyyy" 
+	  			timeZone="America/Sao_Paulo" /> 
+	  			</h:outputText> <br/>
+		  			
+	  			<h:outputText value="Status: " style="font-weight:bold" />
+               	<h:outputText value="#{pessoa.conjuge.status}" /><br/>
+		  					  			
+		  	</p:column>
+		  	
+		  	<p:column></p:column>  		
+        
+        </p:panelGrid>
+      
+       </p:rowExpansion>
+                			
+	<f:facet name="footer"> <h:outputText value="Tem " /> 
+	<h:outputText value="#{fn:length(pessoaBean.membrosCongregacao)}" /> 
+	<h:outputText value=" pessoas cadastradas. " />
+	</f:facet> 
+						 			 		
+ 	</p:dataTable>  
+	 	
+	 		 	 	
+	 	<p:dialog   header="Cadastro de Pessoas" widgetVar="edicaoPessoaDialog"  showEffect="explode" 
+	 	id="pessoa-dialog" resizable="false" modal="true" responsive="true" closeOnEscape="true" >
+		
+			<p:messages id="msgs-dialog" />
+			<p:defaultCommand target="cadastrar-button" scope="pessoa-dialog"/>
+					
+			<p:tabView style="margin-top: 4px" id="painel-dialog">
+			
+											
+			<p:tab title="Foto">			
+	   		<div class="ui-fluid">
+			   		 
+	            <p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder" columnClasses="ui-grid-col-6, ui-grid-col-6" > 
+				
+				<p:graphicImage name="images/#{pessoaBean.pessoaEdicao.id}foto.jpg" style="width: 110px; height: 147px;" 
+				alt="Image Description for #{pessoaBean.pessoaEdicao.nome}" title="#{pessoaBean.pessoaEdicao.nome}"/>
+								
+				<p:fileUpload fileUploadListener="#{pessoaBean.fileUploadAction}" sizeLimit="100000"
+                          showButtons="false" label="Procurar..." auto="true"/>
+                                         
+ 			</p:panelGrid>
+	
+			</div>
+			</p:tab>	
+			      			
+       			<p:tab title="Dados basicos">
+			   		<div class="ui-fluid">
+			   		
+            		<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+					columnClasses="ui-grid-col-3, ui-grid-col-9" > 
+					
+				<p:outputLabel value="Nome" for="nome" style="font-weight:bold"/>
+				<p:inputText id="nome"  maxlength="20"
+				value="#{pessoaBean.pessoaEdicao.nome}"/>	
+       		
+				<p:outputLabel value="Nome Completo" for="nomeCompleto" style="font-weight:bold"/>
+				<p:inputText id="nomeCompleto"  maxlength="50"
+				value="#{pessoaBean.pessoaEdicao.nomeCompleto}"/>
+				
+				<p:outputLabel value="Data nascimento: " for="data-nascimento" style="font-weight:bold"/>
+				<p:calendar id="data-nascimento"  maxlength="10"
+				value="#{pessoaBean.pessoaEdicao.dataNascimento}" pattern="dd/MM/yyyy" mask="99/99/9999"/>
+								
+				<p:outputLabel value="Sexo:" for="sexo" style="font-weight:bold"/>		
+				<h:selectOneRadio  id="sexo" value="#{pessoaBean.pessoaEdicao.sexo}" > 
+				<f:selectItems value="#{pessoaBean.sexo}" var="sexo" 
+				itemLabel="#{sexo}" itemValue="#{sexo}" /> 
+				</h:selectOneRadio>
+				
+				<p:outputLabel for="civil" value="Estado civil:" style="font-weight:bold"/>
+                <p:selectOneMenu id="civil" value="#{pessoaBean.pessoaEdicao.estado_civil}" 
+                  itemValue="" noSelectionOption="true"  >
+                	<f:selectItem itemLabel="Selecione estado civil" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.estadosCivil}" 
+                    itemLabel="#{civil.descricao}" itemValue="#{civil}" var="civil" />
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Cônjuge: "  for="conjuge" style="font-weight:bold; whidth:100px"/>
+                <p:selectOneMenu id="conjuge" value="#{pessoaBean.pessoaEdicao.conjuge}" disabled="" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione cônjuge" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.conjuge}" 
+                    itemLabel="#{pessoa.nomeCompleto}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+				
+				</p:panelGrid>
+       			</div>
+       			</p:tab>
+				       			
+       			<p:tab title="Contato">
+			   	<div class="ui-fluid">
+			   		
+           		<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-4, ui-grid-col-8" >
+       			
+       			<p:outputLabel value="Telefone(res):" for="telefone-res" style="font-weight:bold"/>
+				<p:inputMask id="telefone-res"  maxlength="20"
+				value="#{pessoaBean.pessoaEdicao.telefoneResid}" mask="(99)9999-9999"/>
+				
+				<p:outputLabel value="Telefone(trab):" for="telefone-trab" style="font-weight:bold"/>
+				<p:inputMask id="telefone-trab"  maxlength="20"
+				value="#{pessoaBean.pessoaEdicao.telefoneTrab}" mask="(99)9999-9999"/>
+				
+				<p:outputLabel value="Celular:" for="celular" style="font-weight:bold"/>
+				<p:inputMask id="celular"  maxlength="20"
+				value="#{pessoaBean.pessoaEdicao.celular}" mask="(99)99999-9999"/>
+				
+				<p:outputLabel value="Email" for="email" style="font-weight:bold"/>
+				<p:inputText id="email" maxlength="40"
+				value="#{pessoaBean.pessoaEdicao.email}"/>
+       			
+       			</p:panelGrid>
+       			</div>
+       			</p:tab>
+       			
+       			<p:tab title="Endereço" >
+		   		<div class="ui-fluid" >
+			   		
+           		<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-4, ui-grid-col-8" > 
+								            
+				<p:outputLabel value="Endereço" for="endereco" style="font-weight:bold"/>
+				<p:inputText id="endereco" maxlength="80" 
+				value="#{pessoaBean.pessoaEdicao.endereco}"/>
+				
+				<p:outputLabel value="Bairro" for="bairro" style="font-weight:bold"/>
+				<p:inputText id="bairro"  maxlength="40"
+				value="#{pessoaBean.pessoaEdicao.bairro}"/>
+				
+				<p:outputLabel value="Cidade: "  for="cidade" style="font-weight:bold"/>
+                <p:selectOneMenu id="cidade" value="#{pessoaBean.pessoaEdicao.cidade}" 
+                converter="converterCidade"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione cidade" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{cidadesBean.cidades}" 
+                    itemLabel="#{cidade.nomeCidade}" itemValue="#{cidade}" var="cidade"/>
+                </p:selectOneMenu>
+                				
+				</p:panelGrid>
+       			</div>
+       			</p:tab>
+       			
+       			<p:tab title="Igreja">
+			   	<div class="ui-fluid">
+			   		
+           		<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-4, ui-grid-col-8" > 
+				
+				<p:outputLabel value="Congregação: "  for="congregacao" style="font-weight:bold"/>
+                <p:selectOneMenu id="congregacao" value="#{pessoaBean.pessoaEdicao.congregacao}" 
+                converter="converterCongregacao"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione congregação" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{congregacoesBean.congregacoes}" 
+                    itemLabel="#{congregacao.nomeCongregacao}" itemValue="#{congregacao}" var="congregacao"/>
+                </p:selectOneMenu>
+											
+				<p:outputLabel value="Data conversão: " for="data-conversao" style="font-weight:bold"/>
+				<p:calendar id="data-conversao"  
+				value="#{pessoaBean.pessoaEdicao.dataConversao}" pattern="dd/MM/yyyy" mask="99/99/9999"/>
+						
+				<p:outputLabel value="Data batismo: " for="data-batismo" style="font-weight:bold"/>
+				<p:calendar id="data-batismo" 
+				value="#{pessoaBean.pessoaEdicao.dataBatismo}" pattern="dd/MM/yyyy" mask="99/99/9999"/>
+				
+				<p:outputLabel for="funcao" value="Função: " style="font-weight:bold"/>
+                <p:selectOneMenu id="funcao" value="#{pessoaBean.pessoaEdicao.funcao}" 
+                  itemValue="" noSelectionOption="true" >
+                	<f:selectItem itemLabel="Selecione função" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.funcoes}" 
+                    itemLabel="#{funcao.descricao}" itemValue="#{funcao}" var="funcao"/>
+                </p:selectOneMenu>
+			              
+                <p:outputLabel value="Discipulador: "  for="discipulador" style="font-weight:bold"/>
+                <p:selectOneMenu id="discipulador" value="#{pessoaBean.pessoaEdicao.discipulador}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione discipulador" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.discipuladores}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa" />
+                </p:selectOneMenu>
+                                    				                
+                <p:outputLabel value="Pastor: "  for="pastor" style="font-weight:bold" />
+                <p:selectOneMenu id="pastor" value="#{pessoaBean.pessoaEdicao.pastor}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione pastor" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.pastores}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel for="status" value="Status: " style="font-weight:bold"/>
+                <p:selectOneMenu id="status" value="#{pessoaBean.pessoaEdicao.status}" 
+                  itemValue="" noSelectionOption="true" >
+                	<f:selectItem itemLabel="Selecione status" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.status}" 
+                    itemLabel="#{status.descricao}" itemValue="#{status}" var="status"/>
+                </p:selectOneMenu>
+                
+           
+                
+             </p:panelGrid>
+       			</div>
+       			</p:tab>   
+         
+          </p:tabView>  
+       
+          <p:commandButton value="Cadastrar"  id="cadastrar-button"
+			action="#{pessoaBean.salvar}"
+			process="pessoa-dialog" update="msgs-dialog painel-dialog"
+			oncomplete="if (!args.validationFailed)PF('edicaoPessoaDialog').hide()"/>     																		
+						 			
+		</p:dialog>  
+				
+	 </h:form>	
+	 
+	
+</ui:define>
+</ui:composition> 

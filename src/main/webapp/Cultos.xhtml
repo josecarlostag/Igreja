@@ -1,0 +1,438 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{cultosBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Consulta cultos</h1> 
+ 	
+ 	<h:form id="frm-culto"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Novo Culto" icon="ui-icon-flag" 
+			action="#{cultosBean.prepararNovoCadastro}"
+			process="@this"  update="culto-dialog"
+			
+			oncomplete="PF('edicaoCultoDialog').show()"
+			disabled="#{cultosBean.cultoSelecionado != null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+			
+			<p:resetInput target="culto-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this"  update="culto-dialog"
+	         		oncomplete="PF('edicaoCultoDialog').show()"
+	         		disabled="#{cultosBean.cultoSelecionado == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+	         		
+	         		<p:resetInput target="culto-dialog" />
+	         		
+	         		<f:setPropertyActionListener value="#{cultosBean.cultoSelecionado}" 
+	         		target="#{cultosBean.cultoEdicao}" />
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="cultos-table msgs toolbar"
+	         		action="#{cultosBean.excluir}"
+	         		disabled="#{cultosBean.cultoSelecionado == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+	         		
+	         			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir este culto"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para xls" 
+						ajax="false" immediate="true" >
+	         			<p:dataExporter type="xls" target="cultos-table" fileName="cultos"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	
+   	<p:dataTable value="#{cultosBean.cultoCongregacao}" var="culto" border="1" cellspacing="0" cellpadding="2"
+	emptyMessage="Nenhuma culto cadastrado." rows="10" paginator="true" paginatorPosition="bottom" 
+	id="cultos-table" selection="#{cultosBean.cultoSelecionado}" selectionMode="single" rowKey="#{culto.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-culto:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-culto:toolbar"/>
+  			
+		<p:column  headerText="Congregação" filterBy="#{culto.congregacao.nomeCongregacao}" width="80" >
+  			<h:outputText value="#{culto.congregacao.nomeCongregacao}"/>  
+		</p:column>
+		
+		<p:column headerText="Data"  width="70" filterBy="#{culto.dataReuniao}">  
+			<h:outputText value="#{culto.dataReuniao}">
+	  			<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" /> 	
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Pator" width="60" priority="4">
+  			<h:outputText value="#{culto.pastor.nome}"/>  
+		</p:column>
+		
+		<p:column  headerText="Palavra" width="60" priority="4">
+  			<h:outputText value="#{culto.palavra.nome}"/>  
+		</p:column>
+		
+		<p:column  headerText="Diácono" width="60" pririty="5">
+  			<h:outputText value="#{culto.diacono.nome}"/>  
+		</p:column>
+		
+		<p:column  headerText="Publico" width="60">
+  			<h:outputText value="#{culto.quantidadePessoas}"/>  
+		</p:column>
+		
+		<p:column  headerText="Criança(0-2)" width="80">
+  			<h:outputText value="#{culto.quantidadeCriancas2}"/>  
+		</p:column>
+		
+		<p:column  headerText="Criança(3-4)" width="80">
+  			<h:outputText value="#{culto.quantidadeCriancas4}"/>  
+		</p:column>
+		
+		<p:column  headerText="Criança(5-6)" width="80">
+  			<h:outputText value="#{culto.quantidadeCriancas6}"/>  
+		</p:column>
+		
+		<p:column  headerText="Criança(7-9)" width="80">
+  			<h:outputText value="#{culto.quantidadeCriancas9}"/>  
+		</p:column>
+		
+		<p:column  headerText="Pré-adolescente" width="95">
+  			<h:outputText value="#{culto.quantidadePreAdolescente}"/>  
+		</p:column>
+		
+		<p:column  headerText="Adolescente" width="80">
+  			<h:outputText value="#{culto.quantidadeAdolescente}"/>  
+		</p:column>
+		
+		<p:column  headerText="Consolidação" width="80">
+  			<h:outputText value="#{culto.consolidacao}"/>  
+		</p:column>
+		
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(cultosBean.cultoCongregacao)}" /> 
+			<h:outputText value=" cultos cadastrados. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>
+ 	  
+		
+	 	<p:dialog  header="Relatório de Reunião" widgetVar="edicaoCultoDialog"  showEffect="explode" 
+	 	id="culto-dialog" resizable="false" modal="true" closeOnEscape="true" responsive="true" >
+		
+		<p:messages id="msgs-dialog"/>
+		<p:defaultCommand target="cadastrar-button" scope="culto-dialog"/>
+		
+							
+		<p:tabView style="margin-top: 4px" id="painel-dialog">
+						
+			<p:tab title="Culto">
+			   <div class="ui-fluid">
+			   
+            	<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-3, ui-grid-col-9" >	
+			
+						 	
+                <p:outputLabel value="Congregação: "  for="congregacao" style="font-weight:bold"/>
+                <p:selectOneMenu id="congregacao" value="#{cultosBean.cultoEdicao.congregacao}" 
+                converter="converterCongregacao"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione congregação" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{congregacoesBean.congregacaoUsuario}" 
+                    itemLabel="#{congregacao.nomeCongregacao}" itemValue="#{congregacao}" var="congregacao"/>
+                </p:selectOneMenu>
+                               
+               
+				<p:outputLabel value="Reunião de: " for="reuniao" style="font-weight:bold"/>
+				<p:inputText id="reuniao"  maxlength="30"
+				value="#{cultosBean.cultoEdicao.reuniao}"/>
+				
+				<p:outputLabel value="Data: " for="data" style="font-weight:bold"/>
+				<p:calendar id="data"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.dataReuniao}"
+						pattern="dd/MM/yyyy" mask="99/99/9999"/>
+						
+				<p:outputLabel value="Pastor: "  for="pastor" style="font-weight:bold"/>
+                <p:selectOneMenu id="pastor" value="#{cultosBean.cultoEdicao.pastor}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.pastores}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                            					
+				 <p:outputLabel value="Ministro da palavra: "  for="palavra" style="font-weight:bold"/>
+                <p:selectOneMenu id="palavra" value="#{cultosBean.cultoEdicao.palavra}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Intercessão: "  for="intercessao" style="font-weight:bold"/>
+                <p:selectOneMenu id="intercessao" value="#{cultosBean.cultoEdicao.intercessor}" 
+                converter="converterPessoa" itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                </p:panelGrid>
+                </div>
+            </p:tab>
+            
+            
+			<p:tab title="Horários">
+			<div class="ui-fluid" >
+			<p:panelGrid columns="5" layout="grid" styleClass="panelgrid-noborder" 
+				columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-3, ui-grid-col-2, ui-grid-col-3" >
+				
+				<p:outputLabel value="Interseção" style="font-weight:bold"/>
+				 <p:outputLabel value="iniciou: " for="intercessao_inicio" style="font-weight:bold"/>
+				<p:calendar id="intercessao_inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.intercessaoInicio}"
+						pattern="HH:mm" timeOnly="true" />
+						
+				<p:outputLabel value=" terminou: " for="intercessao_fim" style="font-weight:bold"/>
+				<p:calendar id="intercessao_fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.intercessaoFim}"
+						pattern="HH:mm" timeOnly="true"/>
+				
+				<p:outputLabel value="Recepção" style="font-weight:bold"/>		
+				<p:outputLabel value="iniciou: " for="recepicao_inicio" style="font-weight:bold"/>
+				<p:calendar id="recepicao_inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.recepicaoInicio}"
+						pattern="HH:mm" timeOnly="true"/>
+						
+				<p:outputLabel value="terminou: " for="recepicao_fim" style="font-weight:bold"/>
+				<p:calendar id="recepicao_fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.recepicaoFim}"
+						pattern="HH:mm" timeOnly="true"/>		
+				
+				<p:outputLabel value="Culto" style="font-weight:bold"/>
+				<p:outputLabel value="iniciou: " for="inicio" style="font-weight:bold"/>
+				<p:calendar id="inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.horaInicio}"
+						pattern="HH:mm" timeOnly="true"/>
+						
+				<p:outputLabel value="terminou: " for="fim" style="font-weight:bold"/>
+				<p:calendar id="fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.horaFim}"
+						pattern="HH:mm" timeOnly="true"/>	
+				
+                <p:outputLabel value="Palavra" style="font-weight:bold"/>
+                <p:outputLabel value="iniciou: " for="palavra_inicio" style="font-weight:bold"/>
+				<p:calendar id="palavra_inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.palavraInicio}"
+						pattern="HH:mm" timeOnly="true"/>
+						
+				<p:outputLabel value="terminou: " for="palavra_fim" style="font-weight:bold"/>
+				<p:calendar id="palavra_fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.palavraFim}"
+						pattern="HH:mm" timeOnly="true"/>		
+				
+				<p:outputLabel value="Louvor" style="font-weight:bold"/>		               
+                <p:outputLabel value="iniciou: " for="louvor_inicio" style="font-weight:bold"/>
+				<p:calendar id="louvor_inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.louvorInicio}"
+						pattern="HH:mm" timeOnly="true"/>
+						
+				<p:outputLabel value="terminou: " for="louvor_fim" style="font-weight:bold"/>
+				<p:calendar id="louvor_fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.louvorFim}"
+						pattern="HH:mm" timeOnly="true"/>	
+				
+				<p:outputLabel value="Oferta" style="font-weight:bold"/>		                
+                <p:outputLabel value="iniciou: " for="oferta_inicio" style="font-weight:bold"/>
+				<p:calendar id="oferta_inicio"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.ofertaInicio}"
+						pattern="HH:mm" timeOnly="true"/>
+						
+				<p:outputLabel value="terminou: " for="oferta_fim" style="font-weight:bold"/>
+				<p:calendar id="oferta_fim"  maxlength="10"
+						value="#{cultosBean.cultoEdicao.ofertaFim}"
+						pattern="HH:mm" timeOnly="true"/>	
+						
+						
+						</p:panelGrid>
+                </div>
+            </p:tab>
+										
+			<p:tab title="Colaboradores">
+			<div class="ui-fluid">
+			<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4" >
+						               
+              	 <p:outputLabel value="Diácono Escalado: "  for="diacono" style="font-weight:bold"/>
+                <p:selectOneMenu id="diacono" value="#{cultosBean.cultoEdicao.diacono}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.diaconos}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Anfitrião: "  for="anfitriao" style="font-weight:bold"/>
+                <p:selectOneMenu id="anfitriao" value="#{cultosBean.cultoEdicao.anfitriao}" 
+                converter="converterPessoa" itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Recepção: "  for="recepcao" style="font-weight:bold"/>
+                <p:selectOneMenu id="recepcao" value="#{cultosBean.cultoEdicao.recepicao}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Louvor: "  for="louvor" style="font-weight:bold"/>
+                <p:selectOneMenu id="louvor" value="#{cultosBean.cultoEdicao.louvor}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Mídia: "  for="midia" style="font-weight:bold"/>
+                <p:selectOneMenu id="midia" value="#{cultosBean.cultoEdicao.midia}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Som: "  for="som" style="font-weight:bold"/>
+                <p:selectOneMenu id="som" value="#{cultosBean.cultoEdicao.som}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Dizimo Oferta: "  for="oferta" style="font-weight:bold"/>
+                <p:selectOneMenu id="oferta" value="#{cultosBean.cultoEdicao.oferta}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Apoio: "  for="apoio" style="font-weight:bold"/>
+                <p:selectOneMenu id="apoio" value="#{cultosBean.cultoEdicao.apoio}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel /> <p:outputLabel />
+                				
+				<h:outputText value="Professor: " for="professores" style="font-weight:bold" /> 
+				<p:inputText id="professores"  
+				value="#{cultosBean.cultoEdicao.professores}"/>
+				
+				</p:panelGrid>
+                </div>
+            </p:tab>
+										
+			<p:tab title="Publico">
+			<div class="ui-fluid">
+			<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" >
+				
+				<h:outputText value="Publico: " for="pessoas" style="font-weight:bold" /> 
+				<p:inputText id="pessoas"  maxlength="4"  
+				value="#{cultosBean.cultoEdicao.quantidadePessoas}" />
+				
+				<h:outputText value="Adolescente: " for="adolescente" style="font-weight:bold" /> 
+				<p:inputText id="adolescente"  maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadeAdolescente}"/>
+				
+				<h:outputText value="Pré-adolescente: " for="pre_adolescente" style="font-weight:bold" /> 
+				<p:inputText id="pre_adolescente"  maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadePreAdolescente}"/>
+				
+				<h:outputText value="Crianças (7-9): " for="crianca9" style="font-weight:bold" /> 
+				<p:inputText id="crianca9"   maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadeCriancas9}"/>
+				
+				<h:outputText value="Crianças (5-6): " for="crianca6" style="font-weight:bold" /> 
+				<p:inputText id="crianca6"   maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadeCriancas6}"/>
+				
+				<h:outputText value="Crianças (3-4): " for="crianca4" style="font-weight:bold" /> 
+				<p:inputText id="crianca4"   maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadeCriancas4}"/>
+				
+				<h:outputText value="Bebes(0-2): " for="bebes" style="font-weight:bold" /> 
+				<p:inputText id="bebes"   maxlength="4" 
+				value="#{cultosBean.cultoEdicao.quantidadeCriancas2}"/>
+
+                <h:outputText value="Convidados consolidação: " for="consolidacao" style="font-weight:bold" /> 
+				<p:inputText id="consolidacao" maxlength="4" 
+				value="#{cultosBean.cultoEdicao.consolidacao}"/>
+				
+				</p:panelGrid>
+                </div>
+            </p:tab>
+										
+			<p:tab title="Observações">
+			<div class="ui-fluid">
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-3, ui-grid-col-9" >
+                 
+                  <h:outputText value="Observações: " for="observacoes" style="font-weight:bold" /> 
+				<p:inputTextarea id="observacoes"   maxlength="300" 
+				value="#{cultosBean.cultoEdicao.observacao}"/>
+				
+				<h:outputText value="Testemunho: " for="testemunho" style="font-weight:bold" /> 
+				<p:inputTextarea id="testemunho"   maxlength="300" 
+				value="#{cultosBean.cultoEdicao.testemunho}"/>
+				
+				 <p:outputLabel value="Preenchido por: "  for="preenchido" style="font-weight:bold"/>
+                <p:selectOneMenu id="preenchido" value="#{cultosBean.cultoEdicao.preenchido}" 
+                converter="converterPessoa"  itemValue="" noSelectionOption="true">
+                	<f:selectItem itemLabel="Selecione " itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{pessoaBean.membros}" 
+                    itemLabel="#{pessoa.nome}" itemValue="#{pessoa}" var="pessoa"/>                    
+                </p:selectOneMenu>
+                
+               
+                 
+                
+              </p:panelGrid>
+             
+            </div>
+		</p:tab>
+	</p:tabView>  	
+	
+		<p:outputLabel />
+		<p:commandButton value="Salvar" id="cadastrar-button"
+			action="#{cultosBean.salvar}"
+			process="culto-dialog" update="msgs-dialog painel-dialog"
+			oncomplete="if (!args.validationFailed) PF('edicaoCultoDialog').hide()" />
+     				                 			     										
+		 			
+		</p:dialog>  
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

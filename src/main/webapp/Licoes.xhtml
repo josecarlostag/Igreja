@@ -1,0 +1,171 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{licoesBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Consulta lições</h1> 
+ 	
+ 	<h:form id="frm-licao"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Nova licao" icon="ui-icon-flag"
+			action="#{licoesBean.prepararNovoCadastro}"
+			process="@this"  update="licao-dialog" 
+			oncomplete="PF('edicaoLicaoDialog').show()"
+			disabled="#{licoesBean.licaoSelecionada != null or seguranca.usuarioLogado.usuario.perfil != 'ADMIN'}">		
+			<p:resetInput target="licao-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+       		</span>
+	         		
+       		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+       		process="@this"  update="licao-dialog"
+       		oncomplete="PF('edicaoLicaoDialog').show()" 
+       		disabled="#{licoesBean.licaoSelecionada == null or seguranca.usuarioLogado.usuario.perfil != 'ADMIN'}">
+       			<p:resetInput target="licao-dialog" />       		
+       			<f:setPropertyActionListener value="#{licoesBean.licaoSelecionada}" 
+       			target="#{licoesBean.licaoEdicao}" />      		
+       		</p:commandButton>
+	         		
+       		<p:commandButton icon="ui-icon-trash" title="Excluir" process="@this" update="licoes-table msgs toolbar"
+       		action="#{licoesBean.excluir}" disabled="#{licoesBean.licaoSelecionada == null 
+       		or seguranca.usuarioLogado.usuario.perfil != 'ADMIN'}">
+       		
+       			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+       			message="Tem certeza que deseja excluir esta lição"/>
+       		
+       		</p:commandButton>
+       		
+       		<p:commandButton  title="Download" ajax="false" process="@dialogo-download" value="Download" update="dialogo-download"
+       		oncomplete="PrimeFaces.monitorDownload(start, stop);"  disabled="#{licoesBean.licaoSelecionada == null}" immediate="true" >
+       			<p:resetInput target="dialogo-download" />       		
+       			<f:setPropertyActionListener value="#{licoesBean.licaoSelecionada}" target="#{licoesBean.licaoEdicao}" />      		
+       		<p:fileDownload value="#{licoesBean.file}" />
+       		</p:commandButton>
+       		
+       		
+    		
+   	         		
+       		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para xls" 
+				ajax="false" immediate="true" >
+       			<p:dataExporter type="xls" target="licoes-table" fileName="licoes"/>
+       		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	
+<!--  	
+	<p:tree  expandedIcon="ui-icon-folder-open" value="#{licoesBean.root}" var="node" orientation="horizontal">
+        <p:treeNode>
+            <h:outputText value="#{node}"  >
+           	         		      		
+    		</h:outputText>
+        </p:treeNode>
+    </p:tree>	
+    
+-->    
+   	
+   	<p:dataTable value="#{licoesBean.todasLicoes}" var="licao" border="1" cellspacing="0" cellpadding="2"
+	emptyMessage="Nenhuma lição cadastrada." rows="12" paginator="true" paginatorPosition="bottom" style="margin-top: 10px" 
+	id="licoes-table" selection="#{licoesBean.licaoSelecionada}" selectionMode="single" rowKey="#{licao.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-licao:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-licao:toolbar"/>
+  	
+  			
+		<p:column  headerText="Série" sortBy="#{licao.serie.nomeSerie}"  filterBy="#{licao.serie.nomeSerie}" width="120">
+  			<h:outputText value="#{licao.serie.nomeSerie}"/>  
+		</p:column>
+		
+		<p:column  headerText="Lição" sortBy="#{licoesBean.licaoEdicao.nomeLicao}" filterBy="#{licao.nomeLicao}" width="120">
+  			<h:outputText value="#{licao.nomeLicao}"/>  
+		</p:column>
+			
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(licoesBean.todasLicoes)}" /> 
+			<h:outputText value=" lições cadastradas. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>  
+ 	
+		
+	 	<p:dialog header="Cadastro de licoes" widgetVar="edicaoLicaoDialog"  showEffect="explode" hideEffect="bounce"
+	 	id="licao-dialog" resizable="false" modal="true" closeOnEscape="true">
+		
+			<p:messages id="msgs-dialog"/>
+			<p:defaultCommand target="cadastrar-button" scope="licao-dialog"/>
+			
+			<div class="ui-fluid">
+			
+			<p:panelGrid columns="2" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-2, ui-grid-col-10" id="painel-dialog">
+			
+			 
+			
+			<p:outputLabel value="Lição:" for="licao" style="font-weight:bold"/>
+			<p:inputText id="licao"  maxlength="60"
+			value="#{licoesBean.licaoEdicao.nomeLicao}"/>
+											
+			<p:outputLabel value="Serie: "  for="serie" style="font-weight:bold"/>
+            <p:selectOneMenu id="serie" value="#{licoesBean.licaoEdicao.serie}" 
+            converter="converterSerie"  itemValue="" noSelectionOption="true">
+            	<f:selectItem itemLabel="Selecione serie" itemValue="" noSelectionOption="true" />
+                <f:selectItems value="#{seriesBean.todasSeries}" 
+                itemLabel="#{serie.nomeSerie}" itemValue="#{serie}" var="serie"/>
+            </p:selectOneMenu>
+                						                 			     										
+			<h:outputText />
+			
+				<p:commandButton value="Salvar" id="cadastrar-button"
+				action="#{licoesBean.salvar}"
+				process="licao-dialog" update="msgs-dialog painel-dialog"
+				oncomplete="if (!args.validationFailed) PF('edicaoLicaoDialog').hide()" />	
+															  								
+			</p:panelGrid>
+	 		</div>	
+	 			
+		</p:dialog>
+		  
+		
+		
+		<p:dialog id="dialogo-download" modal="true" widgetVar="downloadDialog" header="Status" 
+ 			draggable="false" closable="false" resizable="false">
+ 			<p:defaultCommand target="cadastrar-button" scope="licao-dialog"/>
+    		<p:graphicImage name="/resources/casaBencao/arquivo.pdf"  />
+	</p:dialog>
+		
+		
+		
+	</h:form>
+	
+	
+	
+	
+	
+	<script type="text/javascript">
+		function start() {
+	    	PF('statusDialog').show();
+		}
+ 
+		function stop() {
+	    	PF('statusDialog').hide();
+		}
+	</script> 
+	
+</ui:define>
+
+</ui:composition> 

@@ -1,0 +1,372 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+	
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	<f:viewAction action="#{financeirosBean.consultar}"/>   
+ 	</f:metadata> 
+ 	<h1 class="aw-page-title">Financeiro</h1> 
+ 	
+ 	<h:form id="frm-financeiro"> 	
+ 	
+ 	<p:messages id="msgs"/>
+ 	 
+ 		<p:toolbar id="toolbar">
+		<f:facet name="left">
+			<p:commandButton value="Novo " icon="ui-icon-flag" 
+			action="#{financeirosBean.prepararNovoCadastro}"
+			process="@this"  update="financeiro-dialog"
+			
+			oncomplete="PF('edicaoFinanceiroDialog').show()"
+			disabled="#{financeirosBean.financeiroSelecionado != null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'}">
+			
+			<p:resetInput target="financeiro-dialog"/>
+			</p:commandButton>
+			
+			<span class="ui-separator">
+				<span class="ui-icon ui-icon-grip-dotted-vertical" />
+	         		</span>
+	         		
+	         		<p:commandButton icon="ui-icon-pencil" title="Editar" 
+	         		process="@this"  update="financeiro-dialog"
+	         		oncomplete="PF('edicaoFinanceiroDialog').show()"
+	         		disabled="#{financeirosBean.financeiroSelecionado == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO'
+	         		or seguranca.usuarioLogado.usuario.congregacao != congregacoesBean.congregacaoSelecionada and seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO' }">
+	         		<p:resetInput target="financeiro-dialog" />
+	         		
+	         		<f:setPropertyActionListener value="#{financeirosBean.financeiroSelecionado}" 
+	         		target="#{financeirosBean.financeiroEdicao}" />
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-trash" title="Excluir" 
+	         		process="@this" update="financeiros-table msgs toolbar"
+	         		action="#{financeirosBean.excluir}"
+	         		disabled="#{financeirosBean.financeiroSelecionado == null or seguranca.usuarioLogado.usuario.perfil == 'USUÁRIO' }">
+	         		
+	         			<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+	         			message="Tem certeza que deseja excluir este registro"/>
+	         		
+	         		</p:commandButton>
+	         		
+	         		<p:commandButton icon="ui-icon-arrowthick-1-s" title="Exportar para XLS" 
+						ajax="false" immediate="true" >
+	         			<p:dataExporter type="xls" target="financeiros-table" fileName="financeiro"/>
+	         		</p:commandButton> 
+		</f:facet>
+		</p:toolbar>
+	<div class="ui-fluid">
+	
+   	<p:dataTable value="#{financeirosBean.financeiroCongregacao}" var="financeiro" border="1" cellspacing="0" cellpadding="2" resizableColumns="true"
+	emptyMessage="Nenhuma registro cadastrado." rows="10" paginator="true" paginatorPosition="bottom" style="margin-top: 10px" 
+	id="financeiros-table" selection="#{financeirosBean.financeiroSelecionado}" selectionMode="single" rowKey="#{financeiro.id}" reflow="true">  
+	
+	<p:ajax event="rowSelect" update=":frm-financeiro:toolbar"/>
+	<p:ajax event="rowUnselect" update=":frm-financeiro:toolbar"/>
+	
+		<p:column headerText="Comgregação" sortBy="#{financeiro.congregacao.nomeCongregacao}" width="110"> 
+	  		<h:outputText value="#{financeiro.congregacao.nomeCongregacao}"/>  
+		</p:column>
+		
+		<p:column headerText="Data" sortBy="#{financeiro.dataCaixa}" width="70" >  
+			<h:outputText value="#{financeiro.dataCaixa}">
+	  			<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" /> 	
+  			</h:outputText>  
+		</p:column>
+  			
+		<p:column  headerText="Dizimo" width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.dizimo}"> 
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Amor"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.amor}"> 
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText> 
+		</p:column>
+		
+		<p:column  headerText="Construção"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.construcao}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Missões"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.missoes}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Novas Igrejas"  width="80" style="text-align:right">
+  			<h:outputText value="#{financeiro.novas}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Jovens"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.jovens}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Pinas"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.pinas}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Louvor"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.louvor}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Bazar"  width="75" style="text-align:right">
+  			<h:outputText value="#{financeiro.bazar}">
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Rede Mulheres"  width="90" style="text-align:right">
+  			<h:outputText value="#{financeiro.redeMulheres}" >
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Total oferta"  width="90" style="text-align:right">
+  			<h:outputText value="#{financeiro.totalOferta}" >
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		<p:column  headerText="Total Geral"  width="90" style="text-align:right">
+  			<h:outputText value="#{financeiro.totalGeral}" >
+  			<f:convertNumber type="currency" currencySymbol="R$" />
+  			</h:outputText>  
+		</p:column>
+		
+		
+					
+		<f:facet name="footer"> <h:outputText value="Tem " /> 
+			<h:outputText value="#{fn:length(financeirosBean.todosFinanceiros)}" /> 
+			<h:outputText value=" registros cadastradas. " /> 
+		</f:facet>
+					 	 			 		
+ 	</p:dataTable>  
+	</div>	
+		
+	 	<p:dialog header="Cadastro de finanças" widgetVar="edicaoFinanceiroDialog"  showEffect="explode" 
+	 	id="financeiro-dialog" resizable="false"  responsive="true" closeOnEscape="true" modal="true">
+		
+			<p:messages id="msgs-dialog"/>
+			
+			<p:defaultCommand target="cadastrar-button" scope="financeiro-dialog"/>
+			
+			<p:tabView style="margin-top: 4px" id="painel-dialog">
+			
+			<p:tab title="Envelopes">
+			
+			<div class="ui-fluid">
+			
+			<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4" id="painel-dialog">
+					
+				<p:outputLabel for="congregacao" value="Congregação:" style="font-weight:bold" />
+                <p:selectOneMenu id="congregacao" value="#{financeirosBean.financeiroEdicao.congregacao}" 
+                converter="converterCongregacao"  itemValue="" noSelectionOption="true" >
+                	<f:selectItem itemLabel="Selecione congregação" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{congregacoesBean.congregacaoUsuario}" 
+                    itemLabel="#{congregacao.nomeCongregacao}" itemValue="#{congregacao}" var="congregacao"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Data:" for="data-caixa" style="font-weight:bold"/>
+				<p:calendar id="data-caixa" 
+				value="#{financeirosBean.financeiroEdicao.dataCaixa}" pattern="dd/MM/yyyy" mask="99/99/9999"/>
+				
+				<p:outputLabel value="Dizimo:" for="dizimo" style="font-weight:bold"/>
+				<p:inputMask id="dizimo"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.dizimo}"/>
+				
+				
+				<p:outputLabel value="Amor: " for="amor" style="font-weight:bold"/>
+				<p:inputMask id="amor"  maxlength="20"  type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.amor}" />
+					
+				
+				<p:outputLabel value="Construção:" for="construcao" style="font-weight:bold"/>
+				<p:inputMask id="construcao"  maxlength="20"  type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.construcao}"/>
+				
+				
+				<p:outputLabel value="Missões:" for="missoes" style="font-weight:bold"/>
+				<p:inputMask id="missoes"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.missoes}"/>
+				
+				
+				<p:outputLabel value="Novas igrejas:" for="novas" style="font-weight:bold"/>
+				<p:inputMask id="novas"  maxlength="20"  type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.novas}"/>
+				
+				
+				<p:outputLabel value="Jovens:" for="jovens" style="font-weight:bold"/>
+				<p:inputMask id="jovens"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.jovens}" />
+				
+								
+				<p:outputLabel value="Pinas:" for="pinas" style="font-weight:bold"/>
+				<p:inputMask id="pinas"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.pinas}" />
+				
+				
+				<p:outputLabel value="Louvor:" for="louvor" style="font-weight:bold"/>
+				<p:inputMask id="louvor"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.louvor}" />
+				
+				
+				<p:outputLabel value="Bazar:" for="bazar" style="font-weight:bold"/>
+				<p:inputMask id="bazar"  maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.bazar}" />
+				
+				
+				<p:outputLabel value="Rede Mulheres:" for="rede" style="font-weight:bold"/>
+				<p:inputMask id="rede" maxlength="20" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.redeMulheres}" decimalSeparator="," thousandSeparator="."/>
+				
+				
+			</p:panelGrid>
+			
+			<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" >
+			
+			<p:outputLabel value="Total de ofertas :" for="total" style="font-weight:bold; float:right"/>
+				<p:inputMask id="total" size="20" maxlength="20"
+				value="#{financeirosBean.financeiroEdicao.totalOferta}" disabled="true" >
+				<f:convertNumber type="currency" currencySymbol="R$" />
+				</p:inputMask>
+			
+				
+			<p:outputLabel value="Total geral :" for="totalGeral" style="font-weight:bold; float:right"/>
+				<p:inputMask id="totalGeral" size="20" maxlength="20"
+				value="#{financeirosBean.financeiroEdicao.totalGeral}" disabled="true" >
+				<f:convertNumber type="currency" currencySymbol="R$" />
+				</p:inputMask>	
+			
+			</p:panelGrid>
+				
+	 		</div>	
+	 		</p:tab>
+	 		
+	 		<p:tab title="Moedas">
+			<div class="ui-fluid">
+			<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+				columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" > 
+				
+				
+				<p:outputLabel value="Dinheiro:" for="dinheiro" style="font-weight:bold"/>
+				<p:inputMask id="dinheiro"  maxlength="10"  type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.dinheiro}" />
+				
+				
+				<p:outputLabel value="Moedas:" for="moeda" style="font-weight:bold"/>
+				<p:inputMask id="moeda"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.moeda}" />
+				
+				
+				<p:outputLabel value="Cheque a vista:" for="cheque-vista" style="font-weight:bold"/>
+				<p:inputMask id="cheque-vista"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.chequeVista}" />
+				
+				<p:outputLabel value="Cheque predatado:" for="cheque-predatado" style="font-weight:bold"/>
+				<p:inputMask id="cheque-predatado"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.chequePredatado}" />
+				
+				
+												
+				<p:outputLabel value="Tickets:" for="tickets" style="font-weight:bold"/>
+				<p:inputMask id="tickets"  maxlength="10"  type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.ticket}" />
+				
+				
+				<p:outputLabel value="Cartão:" for="cartao" style="font-weight:bold"/>
+				<p:inputMask id="cartao"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.cartao}" />
+								
+								
+				<p:outputLabel value="Comprovante Deposito:" for="deposito" style="font-weight:bold"/>
+				<p:inputMask id="deposito"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.deposito}" />
+				
+				
+				<p:outputLabel value="Envelopes Prometido:" for="prometidos" style="font-weight:bold"/>
+				<p:inputMask id="prometidos" maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.prometidos}" />
+				
+                	
+				<p:outputLabel value="Quantidade envelopes:" for="envelope" style="font-weight:bold"/>
+				<p:inputMask id="envelope" maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.envelopes}" />
+								
+				<p:outputLabel value="Quantidade envelope Prometido:" for="envelope-prometido" style="font-weight:bold"/>
+				<p:inputMask id="envelope-prometido"  maxlength="10" type="currency" currencySymbol="R$"
+				value="#{financeirosBean.financeiroEdicao.envelopePrometido}" />
+				
+								
+	 		</p:panelGrid>
+	 		
+	 		<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" >
+			
+			<p:outputLabel value="Total moedas :" for="total-moeda" style="font-weight:bold"/>
+				<p:inputMask id="total-moeda" size="20" maxlength="20"
+				value="#{financeirosBean.financeiroEdicao.totalMoeda}" disabled="true" >
+				<f:convertNumber type="currency" currencySymbol="R$" />
+				</p:inputMask>
+				
+			<p:outputLabel value="Total moedas + Prometido :" for="total-prometido" style="font-weight:bold"/>
+				<p:inputMask id="total-prometido" size="20" maxlength="20"
+				value="#{financeirosBean.financeiroEdicao.totalPrometido}" disabled="true" >
+				<f:convertNumber type="currency" currencySymbol="R$" />
+				</p:inputMask>	
+				
+			<p:outputLabel value="Diferença (total geral - total moeda):" for="diferenca" style="font-weight:bold"/>
+				<p:inputMask id="diferenca" size="20" maxlength="20"
+				value="#{financeirosBean.financeiroEdicao.totalGeral - financeirosBean.financeiroEdicao.totalMoeda}" disabled="true" >
+				<f:convertNumber type="currency" currencySymbol="R$" />
+				</p:inputMask>	
+						
+			</p:panelGrid>
+		
+	 		</div>
+	 		</p:tab>
+	 		
+	 		</p:tabView>
+	 		
+	 		<p:panelGrid columns="4" layout="grid" styleClass="panelgrid-noborder"
+			columnClasses="ui-grid-col-6, ui-grid-col-6" >
+					
+				<p:commandButton value="Salvar" id="cadastrar-button"
+				action="#{financeirosBean.salvar}"
+				process="financeiro-dialog" update="msgs-dialog painel-dialog"
+				oncomplete="if (!args.validationFailed) PF('edicaoFinanceiroDialog').show()" />
+				
+				<p:outputLabel/>
+			</p:panelGrid>
+	 		
+				
+						 			 
+		</p:dialog>  
+		
+	</h:form> 
+	
+</ui:define>
+
+</ui:composition> 

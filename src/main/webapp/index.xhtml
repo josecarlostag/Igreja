@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<ui:composition template ="/WEB-INF/templates/Login.xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+		
+	 <ui:define name="corpo">
+	  	
+	  	<f:metadata>
+    		<f:viewParam name="dummy" />
+    		<f:event listener="#{loginBean.preRender}" type="preRenderView" />
+    	</f:metadata>
+ 		
+	 <div id="login-dialog" >
+    		<h1>Login</h1>
+    		
+    		<h:form id="frm" prependId="false">
+			
+			<p:messages id="msgs"/>	
+			<h:panelGrid columns="2" styleClass="grid-login">
+			
+			<p:outputLabel value="Login: " style="font-weight:bold"/> 
+				<p:inputText id="j_username" size="18"  maxlength="18"
+				value="#{loginBean.login}"/>
+				
+				<p:outputLabel value="Senha: "  style="font-weight:bold"/>
+				<p:password id="j_password" size="10" maxlength="10"
+				/>
+			<h:panelGroup/>
+    				<p:commandButton value="Login" action="#{loginBean.acessa}" ajax="false" 
+    				update ="msgs frm " />		
+			</h:panelGrid>
+							
+	 </h:form>	
+	 </div>
+</ui:define>
+</ui:composition> 

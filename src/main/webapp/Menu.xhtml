@@ -1,0 +1,81 @@
+<!DOCTYPE html> 
+<ui:composition 
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+
+<h:head>
+	<f:facet name="first">
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</f:facet>
+
+	<title>Cadasto</title>
+
+	<h:outputStylesheet library="resources" name="styles/custom.css" />
+	<h:outputStylesheet library="resources" name="styles/components.css" />
+	<h:outputStylesheet library="styles" name="layout.css" />
+	
+	<h:outputScript target="body" library="primefaces" name="jquery/jquery.js" />
+	<h:outputScript target="body" library="javascripts" name="app.js" />	
+</h:head>
+
+<h:body>
+	<header class="aw-topbar">
+		<h:graphicImage library="resources" name="images/logo_ijv.png"  />
+					
+		<a href="#" class="aw-toggle  js-toggle"><i class="fa  fa-bars"></i></a>
+		
+	</header>
+
+
+	<aside class="aw-sidebar js-sidebar">
+	
+		<nav class="aw-menu js-menu">
+		<ul>
+			<li class="aw-pessoa js-pesoa" >
+			<h:link  ><i class="fa  fa-fw fa-male"></i> Pessoas</h:link>
+			</li>
+			
+			<li >
+			<h:link  ><i class="fa  fa-fw fa-slideshare"></i> Congregações</h:link>
+			</li>
+			<li>
+			<h:link  ><i class="fa  fa-fw fa-bar-chart"></i> Cultos</h:link>
+			</li> 
+			<li>
+			<h:link  ><i class="fa  fa-fw fa-home"></i> Casa de Benção</h:link>
+			</li>
+			<li>
+			<h:link ><i class="fa  fa-fw fa-university"></i> Casa de Crescimento</h:link>
+			</li>
+			<li>
+			<h:link ><i class="fa  fa-fw fa-file-text-o"></i> Lições</h:link>
+			</li>
+			<li>
+			<h:link ><i class="fa  fa-fw fa-chain"></i> Cidade</h:link>
+			</li>
+			<li >
+			<h:link  ><i class="fa  fa-fw fa-pie-chart"></i> Gráficos</h:link>
+			</li>
+			<li>
+			<h:link  ><i class="fa  fa-fw fa-user"></i> Usuários</h:link>
+			</li>
+			<li>
+			<h:link outcome="index"><i class="fa  fa-fw fa-power-off"></i> Sair</h:link>
+			</li>
+		
+		</ul>
+		</nav>
+	
+</aside>
+
+
+</h:body>
+
+
+</ui:composition>

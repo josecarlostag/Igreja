@@ -1,0 +1,103 @@
+<!DOCTYPE html> 
+<ui:composition template ="/WEB-INF/templates/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+			
+	 <ui:define name="content">	
+
+	<f:metadata> 
+    	   	
+    	   	  <f:viewAction action="#{congregacoesBean.consultar}"/>  	    
+ 	</f:metadata> 
+ 	
+ 	<h1 class="aw-page-title">Gráficos de membros</h1> 
+ 	<h:outputStylesheet library="styles" name="custom.css" />
+ 	
+ 	<h:form id="frm-grafico">
+ 	
+ 	<p:growl id="msgs" showDetail="true" />
+ 	<div class="ui-fluid">
+ 	
+ 	<p:accordionPanel  id="painel"  >
+			
+        <p:tab title="Gráfico de barras Congregações">
+           <h:panelGrid  columns="1"  layout="grid" 
+			columnClasses="ui-grid-col-1"  >         
+            	
+           	<p:chart type="bar" model="#{barrasCongregacoes.animatedModelBarra}" style="height:300px;" responsive="true" />
+            	     
+        	</h:panelGrid>
+        </p:tab>
+          
+        <p:tab title="Gráfico de linhas Congregações">
+           <h:panelGrid columns="1" cellpadding="5">         
+            	
+              <p:chart type="line" model="#{linhasCongregacoes.animatedModelLinha}" style="height:300px;" responsive="true" />	
+            	     
+        	</h:panelGrid>
+        </p:tab>
+        
+        <p:tab title="Gráfico Casa de Benção e de Crescimento">
+           <h:panelGrid columns="1" cellpadding="5">         
+            	
+           	<p:chart type="bar" model="#{barraCasas.animatedModelBarra}" style="height:300px;" responsive="true"/>
+            	     
+        	</h:panelGrid>
+        </p:tab>
+        
+        <p:tab title="Gráfico Casa de Benção e de Crescimento por congregações">
+           <h:panelGrid columns="1" cellpadding="5">         
+            	
+           	<p:chart type="bar" model="#{barraCasas.barraCongrega}" style="height:300px;" responsive="true" />
+            	     
+        	</h:panelGrid>
+        </p:tab>
+        
+        <p:tab title="Gráfico frequência nos cultos por categorias">
+           <h:panelGrid columns="1" cellpadding="5"> 
+                   	
+              <p:chart type="line" model="#{linhasCultos.publicoCulto}" style="height:300px;" responsive="true" />	
+            	     												
+        	</h:panelGrid>
+        </p:tab>
+        
+        <p:tab title="Gráfico frequência nos cultos por congregação">
+           <h:panelGrid columns="1" cellpadding="5"> 
+                   	
+              <p:chart type="line" model="#{dataCultos.animatedModelLinha}" style="height:300px;" responsive="true"/>	
+            	     												
+        	</h:panelGrid>
+        </p:tab>
+        
+        
+                
+        <p:tab title="Gráfico de membros das congregações" toggleSpeed="600">        
+             <h:panelGrid columns="1" cellpadding="1">	
+               
+           <p:chart type="line" styleClass="" model="#{membrosCongregacoes.areaSexo}" style="height:300px;"  responsive="true"/>
+   
+            	     
+        	</h:panelGrid>
+        </p:tab>
+        
+        <p:tab title="Gráfico de funções nas congregações" toggleSpeed="300" >
+           <h:panelGrid columns="1" cellpadding="1">         
+              	
+            <p:chart type="line" model="#{funcoesCongregacoes.areaModel}" style="height:300px;" responsive="true" />	
+            	     
+        	</h:panelGrid>
+        </p:tab>
+        
+       
+        
+    </p:accordionPanel>
+ 	
+ 	</div>
+						 		
+	</h:form> 	
+</ui:define>
+</ui:composition> 
